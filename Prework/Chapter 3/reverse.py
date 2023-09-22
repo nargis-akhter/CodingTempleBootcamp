@@ -1,3 +1,5 @@
+#The reverse() method reverses the elements of the list
+
 favorite_locations = ['Makkah', 'Madina', 'Bali', 'Maldives', 'Dubai']
 favorite_locations.sort()
 print(favorite_locations)
