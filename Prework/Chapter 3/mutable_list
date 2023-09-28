@@ -1,0 +1,7 @@
+#Lists are mutable. This means you can change their values even after they've beeen created.
+
+nums = [8, 16, 19]
+nums[0] = 1
+nums[1] = 2
+nums[2] = 3
+print(nums)

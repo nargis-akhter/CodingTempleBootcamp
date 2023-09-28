@@ -18,6 +18,15 @@ print(message2)
 message3 = "Hi " + friends_names[3] + " " + "What are you doing?"
 print(message3)
 
+#You can create a list with values that have been stored in variables
+name = "Sarah"
+age = 34
+country = "Germany"
+info = [name, age, country]
+print(info[0])
+print(info[1])
+print(info[2])
+
 
 
 

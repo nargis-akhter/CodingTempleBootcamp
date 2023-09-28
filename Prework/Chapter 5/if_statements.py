@@ -20,7 +20,7 @@ age = 12
 if age < 4: #If the test passes, an appropriate message is printed and Python skips the rest of the tests.
     print("Your admission cost is $0.")
     
-elif age < 18: #Another if test, which runs only if the previous test failed
+elif age < 18: #Used to check for more conditions if the first condition is not met
     print("Your admission cost is $5.")
 else: #If both the if and elif tests fail, Python runs the code in the else block at
     print("Your admission cost is $10.")
