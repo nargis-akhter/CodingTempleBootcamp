@@ -5,3 +5,8 @@ print(animals[-1]) # Last element
 print(animals[-2]) # Second last element
 print(animals[-3:]) # Last 3 elements
 print(animals[-3:-1])
+
+#This is tricky because you have to remember that -1 is exclusive when the last value when slicing:
+print(c[1:-1])
+but inclusive when not slicing!
+print(c[-1])
