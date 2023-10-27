@@ -21,17 +21,17 @@ The R library `dplyr` is a super useful too we can use to explore and
 manipulate our data.
 
 ```{r}
-# Install our package
+# Install our packages
 install.packages('tidyverse')
 
-# Load our package from the library:
+# Load the library
 library(tidyverse)
-
 ```
 
 More things we can do to get more information on R and what we're doing:
 
 ```{r}
+# To better understand how we can work with a package or information on a built-in dataset, we can call help, or ?
 help(tidyverse)
 ?tidyverse
 ```
@@ -42,10 +42,10 @@ list. We'll open these packages with the `library()` function later.
 
 ```{r}
 install.packages(c('nycflights13', 'gapminder', 'Lahman'))
+
 library(nycflights13)
 
 nycflights13::flights
-
 ```
 
 ## Exploration
@@ -97,10 +97,11 @@ imagine them like tables in SQL for right now. An example of the dplyr
 syntax:
 
 ```{r}
-# Filter information in the DF, where the month == 3, day ==31
+# Filtering information from the dataframe looking at where the month == 3, day == 31
 
-# filter(df, conditional1, conditional2)
-View(filter(flights, month==3, day==31))
+#filter(flights, month==3, day==31)
+View(flights)
+
 ```
 
 In the above example, I had two arguments - month == 3, and day == 31.
@@ -122,26 +123,27 @@ carrier_df
 
 ```{r}
 delayed_times_df <- filter(flights, dep_time <= 1000 & sched_arr_time >= 1000 & arr_delay != 0)
-View(delayed_times_df)
+
+delayed_times_df
 ```
 
 ### Arranging Rows
 
 ```{r}
+arrange(flights, year, month, day, desc(sched_dep_time))
+
 View(arrange(flights, year, month, day, desc(sched_dep_time)))
 ```
 
 ## Selecting Columns
 
 ```{r}
-# Method 1:
 flights$dep_time
-
-# Method 2:
-flights['dep_time']
 ```
 
 ```{r}
+# What if I wanted more than just a single column back?
+# Indexing is always option, but why would I when dplyr has a built in function to deal with this instead?
 select(flights, year, month, day)
 ```
 
@@ -172,19 +174,19 @@ Some examples of these are:
     the rest of the data.
 
 ```{r}
-# Select all columns from the flight dataset:
+# Select all columns from flights:
 select(flights, everything())
 
-# Select all columns from the flights dataset that start witht the letter c:
+# Select all columns from flights that start with the letter "C"
 select(flights, starts_with('c'))
 
-# Select all the columns that end with the letter e:
+# Select al columns from flights that end with the letter 'E'
 select(flights, ends_with('e'))
 
-# Select all columns that contain the letter g:
+# Select all columns that contain the letter 'g':
 select(flights, contains('g'))
 
-# Select all columns that match the gex expression fl|c
+# Select all columns that match the regex expression fl|c
 select(flights, matches('fl|c'))
 ```
 
@@ -193,7 +195,7 @@ Select can also be used to get columns by index. To do so, we use the
 indicies:
 
 ```{r}
-select(flights, c(1,3,5,7))
+select(flights, 1:3)
 ```
 
 ### Mutating Data
@@ -203,16 +205,14 @@ exploring out data. This function allows us to combine observations from
 other columns to create a new column of observations. For example:
 
 ```{r}
-flight_data <- select(
-  flights,
-  year:day,
-  ends_with('delay'),
-  distance,
-  air_time
-)
+flight_data <- select(flights,
+                      year:day,
+                      ends_with('delay'),
+                      distance,
+                      air_time)
 View(flight_data)
 
-# Apply a mutation to the dataset:
+# apply a mutation:
 flight_data_mut <- mutate(flight_data,
                           gain = arr_delay - dep_delay,
                           speed = distance / air_time * 60)
@@ -234,22 +234,20 @@ Transmutation is when we want to create these new variables in our
 dataframe, but only want to return those variables back to us!
 
 ```{r}
-flight_data <- select(
-  flights,
-  year:day,
-  ends_with('delay'),
-  distance,
-  air_time
-)
+
+flight_data <- select(flights,
+                      year:day,
+                      ends_with('delay'),
+                      distance,
+                      air_time)
 View(flight_data)
 
-# Apply a mutation to the dataset:
+# apply a transmutation:
 flight_data_tmut <- transmute(flight_data,
                           gain = arr_delay - dep_delay,
                           speed = distance / air_time * 60)
 
 View(flight_data_tmut)
-
 ```
 
 ### Summarizing Data
@@ -271,7 +269,7 @@ very similar to how we use aggregate functions in SQL.
 ```{r}
 by_day <- group_by(flights, year, month, day)
 
-View(summarize(by_day, delay=mean(dep_delay, na.rm=TRUE)))
+summarize(by_day, delay = mean(dep_delay, na.rm=TRUE))
 ```
 
 ## In-Class Exercise 1:
@@ -289,7 +287,13 @@ Using the built in dataset, `mtcars`;
 -   Summarize your data!
 
 ```{r}
-mtcars
+select(mtcars, starts_with('m'))
+
+select(mtcars, ends_with('g'))
+
+select(mtcars, matches('mp|c'))
+
+mutate(mtcars, disp_per_cyl = disp/cyl)
 ```
 
 ### Using Pipe to string together functions
@@ -308,14 +312,11 @@ airports that it will make it hard to see the data we want to focus on.
 by_destination <- group_by(flights, dest)
 by_destination
 
-delay <- summarize(
-  by_destination,
-  count= n(), # n() give us the current group size
-  dist = mean(distance, na.rm=TRUE),
-  delay = mean(arr_delay, na.rm=TRUE)
-)
-delay
-
+delay <- summarize(by_destination,
+                   count = n(),# n() gives us the current group size
+                   dist = mean(distance, na.rm=TRUE),
+                   delay = mean(arr_delay, na.rm=TRUE)
+                   )
 delay <- filter(delay, count > 20, dest != 'HNL')
 delay
 ```
@@ -328,8 +329,8 @@ delays <- flights %>%
   group_by(dest) %>%
   summarize(
     count = n(),
-    dist = mean(distance, na.rm=TRUE),
-    delay = mean(arr_delay, na.rm=TRUE),
+    dist = mean(distance, na.rm = TRUE),
+    delay = mean(arr_delay, na.rm = TRUE),
     carrier
   ) %>%
   filter(count > 20, dest != 'HNL')
@@ -357,6 +358,7 @@ not_cancelled <- flights %>%
             tailnum,
             arr_delay)
 
+
 not_cancelled
 ```
 
@@ -371,7 +373,7 @@ your data.
 f <- flights %>%
   filter(carrier != 'UA') %>%
   group_by(sched_arr_time) %>%
-  summarize(mean = mean(arr_delay, na.rm=TRUE),
+  summarize(mean = mean(arr_delay, na.rm = TRUE),
             count = n())
 
 f
@@ -383,13 +385,13 @@ Now we can look at the plotted data of delay times, and try to learn
 something about delay times.
 
 ```{r}
+
 delay <- not_cancelled %>%
   group_by(tailnum) %>%
   summarize(
     delay = mean(arr_delay)
   )
-
-ggplot(data=delays, mapping = aes(x=delay)) +
+ggplot(data=delays, mapping=aes(x=delay)) +
   geom_freqpoly(binwidth=10)
 ```
 
@@ -409,7 +411,7 @@ delay <- not_cancelled %>%
     delay = mean(arr_delay),
     n = n()
   )
-ggplot(data=delay, mapping = aes(x = n, y = delay)) +
+ggplot(data=delay, mapping=aes(x = n, y=delay)) +
   geom_point(alpha = 1/10)
 ```
 
@@ -423,7 +425,7 @@ any other flights.
 ```{r}
 delay %>%
   filter(n>25) %>%
-  ggplot(mapping = aes(x=n, y=delay)) +
+  ggplot(mapping = aes(x=n, y = delay)) +
   geom_point(alpha = 1/10)
 ```
 
@@ -437,7 +439,7 @@ the `mpg` database to it.
 
 ```{r}
 myplot <- mpg
-# ?mpg
+
 View(myplot)
 View(diamonds)
 ```
@@ -453,7 +455,7 @@ easiest fashion with little to no code. For example, we can look at the
 diamonds dataset and quickly plot the carat and price columns from it
 
 ```{r}
-qplot(carat, price, data=diamonds)
+qplot(carat,price, data=diamonds)
 ```
 
 We can see that there is some form of linear relationship here, but with
@@ -472,6 +474,7 @@ the carb and cyl columns from it
 
 ```{r}
 qplot(carb, cyl, data=mtcars)
+
 ```
 
 #### Arguments
@@ -502,18 +505,17 @@ qplot(carat,
       price,
       data=diamonds,
       colour = color,
-      size=1,
+      size = 1,
       alpha = 1/100)
-
 ```
 
 One thing to note is that the color and shape work well with discrete
 data, while size works well with continuous!
 
 ```{r}
-qplot(price, data=diamonds, binwidth=500) + 
+qplot(price, data=diamonds, binwidth = 500) + 
   labs(x='Price', y='Frequency', title = 'Distribution of Diamond Prices') +
-  theme(plot.title=element_text(hjust=.5))
+  theme(plot.title = element_text(hjust=0.5))
 ```
 
 ## In-Class Exercise 3:
@@ -531,9 +533,10 @@ independent and dependent variables.
 ### `ggplot()`
 
 ```{r}
-# ggplot(data, mapping=aes(col1, col2, color, etc))
-# + whatever graphic we want to add on 
-# geom_point(mapping=aes(columns we want vis))
+# ggplot(data)
+# + whatever graphic you want added on
+# For example,
+# geom_point(mapping= aes(columns we want visualized))
 ```
 
 ```{r}
@@ -542,17 +545,17 @@ ggplot(data=myplot) +
 ```
 
 ```{r}
-ggplot(data=myplot,mapping = aes(displ, hwy, color = class)) +
+ggplot(data=myplot, mapping = aes(displ, hwy, color = class)) + 
   geom_point()
 ```
 
 ```{r}
-ggplot(data=myplot,mapping = aes(displ, hwy, color = displ)) +
+ggplot(data=myplot, mapping = aes(displ, hwy, color = displ)) + 
   geom_point()
 ```
 
 ```{r}
-ggplot(data=myplot,mapping = aes(displ, hwy, color = displ < 5)) +
+ggplot(data=myplot, mapping = aes(displ, hwy, color = displ < 5)) + 
   geom_point()
 ```
 
@@ -576,25 +579,26 @@ appropriate facet function to your `ggplot` code and specify the
 variable(s) to use for faceting.
 
 ```{r}
-ggplot(data=myplot) + 
-  geom_point(mapping = aes(displ, hwy, shap=drv, color = rgb(.7,1,.3)))+
-  facet_wrap(~class, nrow=2)
+ggplot(data=myplot) +
+  geom_point(mapping = aes(displ, hwy, shap = drv, color = rgb(0.7,1.0,.3))) + 
+  facet_wrap(~class, nrow = 2)
 ```
 
 ```{r}
-ggplot(data=myplot) + 
-  geom_point(mapping = aes(displ, hwy, shape=drv, color = rgb(.7,1,.3)))+
-  facet_wrap(~class, nrow=2) +
-  scale_shape_manual(values = c(1,2,3)) +
-  labs(x='Engine Displacement (L)', y= 'Highway Miles Per Gallon (MPG)')+
-  theme(axis.text.x = element_text(size=10, color='blue'),
-        axis.text.y = element_text(size=10, color='red'),
-        legend.position='bottom')
+ggplot(data=myplot) +
+  geom_point(mapping = aes(displ, hwy, shap = drv, color = rgb(0.7,1.0,.3))) + 
+  facet_wrap(~class, nrow = 2) +
+  scale_shape_manual(values = c(1,2,3))  +
+  xlab("Engine Displacement (L)") +
+  ylab('Highway Miles Per Gallon (MPG)') +
+  theme(axis.text.x = element_text(size = 10, color  = 'blue'),
+        axis.text.y = element_text(size =10, color = 'red'),
+        legend.position = 'bottom')
 ```
 
 ```{r}
-ggplot(data =myplot) +
-  geom_point(mapping = aes(displ, hwy, color = class))+
+ggplot(data=myplot) +
+  geom_point(mapping = aes(displ, hwy, color = class)) +
   facet_grid(drv ~.)
 ```
 
@@ -619,18 +623,31 @@ ggplot(data=myplot) +
 
 ```{r}
 ggplot(data=myplot) +
-  geom_smooth(mapping = aes(displ, hwy, linetype= drv))+
-  geom_point(mapping = aes(displ, hwy, color = drv))
+  geom_point(mapping = aes(displ, hwy, color = class)) + 
+  facet_grid(drv ~ .) +
+  ggtitle("Highway MPG vs Engine Displacement by Class and Drivetrain") + 
+  xlab("Engine Displacement (L)")+
+  ylab("Highway MPG") +
+  theme(legend.position = 'bottom',
+        legend.text = element_text(size=10))
 ```
 
 ```{r}
 ggplot(data=myplot) +
-  geom_smooth(mapping = aes(displ, hwy, linetype= drv),se=FALSE)+
+  geom_point(mapping = aes(displ, hwy), position = 'jitter')
+```
+
+```{r}
+ggplot(myplot) +
+  geom_smooth(mapping = aes(displ, hwy, linetype = drv)) +
   geom_point(mapping = aes(displ, hwy, color = drv))
 ```
 
 ```{r}
-
+ggplot(myplot, mapping = aes(displ, hwy, linetype = drv)) +
+  geom_point(aes(colour = class))  +
+  geom_smooth(se=FALSE)
+  
 ```
 
 ```{r}
@@ -672,17 +689,18 @@ ggplot(diamonds) +
 ```
 
 ```{r}
-ggplot(diamonds) +
-  geom_bar(aes(cut, fill = cut), position = 'identity', alpha = 1/2)
+ggplot(diamonds, mapping = aes(cut, fill  = clarity)) +
+  geom_bar(alpha = 1/5, position = 'identity')
 ```
 
 ```{r}
-ggplot(diamonds) +
-  geom_bar(aes(cut, fill = clarity), position = 'dodge')
+ggplot(diamonds, mapping = aes(cut, fill  = clarity, color = cut)) +
+  geom_bar(fill = NA, position = 'identity')
 ```
 
 ```{r}
-
+ggplot(diamonds)+
+  geom_bar(mapping = aes(cut, fill=clarity), position = 'dodge')
 ```
 
 #### Pie Chart
@@ -691,23 +709,21 @@ What if I wanted to add an additional variable to my graph as well as
 change the graphic into a pie chart?
 
 ```{r}
-pie = ggplot(diamonds) + 
-  geom_bar(aes(cut, fill = clarity),
-           position = 'fill') +
-  theme(aspect.ratio=1)+
+pie = ggplot(diamonds) +
+  geom_bar(aes(cut, fill =clarity),
+           postion = 'fill') +
+  theme(aspect.ratio = 1) +
   labs(x=NULL, y=NULL)
-
 pie + coord_polar()
 ```
 
 ```{r}
-pie = ggplot(diamonds) + 
-  geom_bar(aes(cut, fill = clarity),
+pie1 = ggplot(diamonds) +
+  geom_bar(aes(cut, fill =clarity),
            position = 'dodge') +
-  theme(aspect.ratio=1)+
+  theme(aspect.ratio = 1) +
   labs(x=NULL, y=NULL)
-
-pie + coord_polar()
+pie1 + coord_polar()
 ```
 
 #### In-Class Discussion
@@ -725,13 +741,19 @@ to generate a box-plot, we can use the `geom_boxplot()` function in
 conjunction with our `ggplot()` library
 
 ```{r}
-
+ggplot(myplot, aes(class, hwy)) +
+  geom_boxplot()
 ```
 
 #### Customizing a box-plot
 
 ```{r}
-
+ggplot(myplot, aes(class, hwy)) +
+  geom_boxplot(fill = '#336699', color = '#336699', alpha = 0.7) +
+  geom_jitter(width = 0.2, height = 0, color = '#FFA550', alpha = 0.7)+
+  labs(title = 'Highway MPG by Car CClass', x = 'Car Class', y = 'Highway MPG') +
+  theme_bw() +
+  coord_flip()
 ```
 
 ## In-Class Exercise 4:
@@ -743,29 +765,38 @@ creating the graphic. Your graphic should include colors, a title for
 all axes and for the graphic itself.
 
 ```{r}
-data()
+
 ```
 
 ```{r}
 
 ```
 
-## Vizulations Cont.
+## Visualizations Cont.
 
 #### Map Data
 
 ```{r}
+nz <- map_data('nz')
 
+ggplot(nz, aes(long, lat, group = group)) +
+  geom_polygon(fill='white', color = 'black')
 ```
 
 ```{r}
-
+ggplot(nz, aes(long, lat, group = group)) +
+  geom_polygon(fill='white', color = 'black') +
+  coord_quickmap()
 ```
 
 #### Customize a map
 
 ```{r}
-
+ggplot(nz, aes(long, lat, group = group)) +
+  geom_polygon(fill='white', color = 'black') + 
+  coord_quickmap() +
+  labs(x = 'Longitude', y = 'Latitude', title = 'Map of New Zealand') +
+  theme(axis.title = element_text(size=10))
 ```
 
 ## Functions and Conditionals
@@ -784,38 +815,42 @@ Reproducibility/Automation
 Once I build a function, I can use across my programs.
 
 ```{r}
-# def function(params):
-# Do stuff
-# Return stuff
-
-# Syntax in R:
-our_function <- function(optional_params){
+# In Python, we are used to this syntax:
+# def function(optional parameters):
   # Do stuff
   # Return stuff
-}
-# To invoke:
-our_function(whatever params go here)
 
+# Syntax in R:
+our_function <- function(optional_parameters){
+  # Do stuff
+}
+
+# To invoke, we call to it:
+our_function(whatever optional params I need)
 ```
 
 An example:
 
 ```{r}
-# Create a function that could conver celcius to far
-# C * (9/5) + 32
+# Create a function that could convert celcius to far
+# Formula for this conversion is: C * (9/5) + 32
 
 c_to_f <- function(val){
   temp_fahr <- val * (9/5) + 32
   return(temp_fahr)
 }
+
+# Call to the function to see if it works:
+c_to_f(0)
 ```
 
 This is all cool.. but it didn't do anything. We need to call the
 function!
 
 ```{r}
-test_temps <- c(16.55,26.99,32.59,8.58,28.03,28.54,21.97)
+test_temps <- c(16.55, 26.99, 32.59, 8.58, 28.03, 28.54, 21.97)
 
+# Then we can call the function on the vector:
 c_to_f(test_temps)
 ```
 
@@ -831,7 +866,12 @@ follows: `apply(X, MARGIN, FUN)` where X is the data set to use, MARGIN
 is specification for rows or columns, and FUN is the function to apply.
 
 ```{r}
+# Create a matrix:
+test_mat <- matrix(c(1,1,1,2,2,2),nrow = 2)
+test_mat
+class(test_mat)
 
+apply(test_mat, 2, sum)
 ```
 
 It is common to use `mean`, `median`, `sum`, `min`, or `max` with
@@ -839,7 +879,10 @@ It is common to use `mean`, `median`, `sum`, `min`, or `max` with
 that apply() only works with matrices.
 
 ```{r}
+test_temp_mat <- matrix(test_temps, nrow=2)
+test_temp_mat
 
+apply(test_temp_mat, 1, c_to_f)
 ```
 
 #### More Functions!
@@ -847,37 +890,79 @@ that apply() only works with matrices.
 Now, let's create a function to check if a number is even or odd!
 
 ```{r}
+check_num <- function(x){
+  if (x %% 2 == 0){
+    print('Even')
+  } else {
+    print('Odd')
+  }
+}
 
+# Test it out:
+check_num(4)
+check_num(5)
 ```
 
 Next, let's calculate a factorial:
 
 ```{r}
+# 5! = 5 * 4 * 3 * 2 * 1
+
 calc_factorial <- function(x){
   if (x < 0){
-    print('Factorial is not defined for negative numbers')
+    print('Factorial is not defined for negative numbers!')
   } else if (x == 0) {
     print('Factorial of 0 is 1')
-  } else {
+  } else{
     result <- 1
     for (i in 1:x){
       result <- result * i
     }
-    print(paste('Factorial of', x, 'is', result))
+    print(paste("Factorial of", x, 'is', result, '.'))
   }
 }
 
-calc_factorial(5)
+calc_factorial(c(5, 7, 9))
 ```
 
 What if we wanted to use a function on a vector?:
 
 ```{r}
+calc_mean <- function(x){
+  # If it is empty:
+  if (length(x) == 0){
+    print('Cannot calculate the mean of an empty vector!')
+  } else{
+    sum  <- 0
+    for (i in 1:length(x)){
+      sum <- sum + x[i]
+    }
+    print(paste0('Mean of the vector is: ', sum/length(x), '.'))
+  }
+}
 
+calc_mean(c(2,4,6))
+calc_mean(c())
 ```
 
 ```{r}
+calc_max <- function(x){
+  # If it is empty:
+  if (length(x) == 0){
+    print('Cannot calculate the max of an empty vector!')
+  } else{
+    max <- x[1]
+    for(i in 2:length(x)){
+      if (x[i] > max){
+        max <- x[i]
+      }
+    }
+    return(paste0('Maximum value of the vector is: ', max, '.'))
+  }
+}
 
+calc_max(c(2,4,6))
+calc_max(c())
 ```
 
 ## In Class Exercise 5:
@@ -896,26 +981,55 @@ Test it using a positive and negative number as well as 0.
 The basic syntax for an if statement goes like this:
 
 ```{r}
-
+if (logical_statement) {
+  do something
+} else if (logical_statement_2){
+  do something else if
+} else {
+  do something else here instead
+}
 ```
 
 The logical statements should boil down to a boolean; for example:
 
 ```{r}
+a <- 10
 
+if (a <=5){
+  print(a)
+} else{
+  print('The input value is greater than 5')
+}
 ```
 
 We can also add else if statements in the middle if we need more
 options.
 
 ```{r}
+b <- 15
+
+if (b <= 5){
+  print('small number')
+} else if (b > 5 & b <=10){
+  print('medium number')
+} else {
+  print('big number')
+}
 
 ```
 
 We can also nest conditionals just like we do in Python.
 
 ```{r}
+c <- 5
 
+if (c/2 != 0){
+  if (c==5){
+    if (c<10){
+      print('c is the value of 5')
+    }
+  }
+}
 ```
 
 Nested ifelse statement: This is a powerful way to evaluate multiple
@@ -924,7 +1038,9 @@ ifelse statements is ifelse(condition1, value1, ifelse(condition2,
 value2, ifelse(condition3, value3, value4))). Here is an example:
 
 ```{r}
+x <- 10
 
+ifelse(x < 5, 'low', ifelse(x<10, 'medium', 'high'))
 ```
 
 Switch statement: The switch statement is similar to a series of ifelse
@@ -932,7 +1048,10 @@ statements but can be more efficient and easier to read. The syntax is
 switch(expression, value1, value2, ..., valueN).
 
 ```{r}
-
+z <- c(1, 2, 3, 4)
+#z <- 1
+for (x in z){
+  switch(x, 'summer', 'fall','winter', 'spring')}
 ```
 
 Case_when statement: The case_when statement is a versatile way to
@@ -945,7 +1064,11 @@ One thing to note here, is that case_when is associated with your
 `tidyverse` library pre-loaded.
 
 ```{r}
+x <- 10
 
+case_when(x<5 ~ 'low', x <= 10 ~ 'medium', TRUE ~ 'high')
+  
+  
 ```
 
 Short-circuit evaluation: Short-circuit evaluation is a way to evaluate
@@ -954,7 +1077,11 @@ condition if the first condition is true. The syntax is condition1 &&
 condition2.
 
 ```{r}
-
+if(x<5 || x > 20){
+  print('out of range')
+} else{
+  print('in range')
+}
 ```
 
 ## In Class Exercise 6:
@@ -963,7 +1090,12 @@ Create two vectors of numbers. Using a conditional statement, change the
 value for the vectors into a character type:
 
 ```{r}
+x <-  c(1,2,3,4,5)
+y <- c(1,2,3,4)
 
+if(length(x) > 0){
+  case_when(x == 1 ~'one', x == 2 ~'two', x==3 ~'three', x==4 ~ 'four', TRUE ~ 'five')
+}
 ```
 
 Now, let's look at another core part of R programming - Loops!
@@ -971,38 +1103,69 @@ Now, let's look at another core part of R programming - Loops!
 ### Loops
 
 ```{r}
-
+for (val in x){
+  do something
+}
 ```
 
 ```{r}
-
+for (value in 1:5){
+  print(paste(value, 'is greater than', value -1))
+}
 ```
 
 We can also do nifty stuff with our vectors, such as apply changes to
 specific indices of our data.
 
 ```{r}
+vec <- c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)
 
+# Change the first, third, and sixth elements to the value of 6:
+for(i in c(1,3,6)){
+  vec[i] <- 6
+}
+
+vec
 ```
 
 We can loop over more than just lists:
 
 ```{r}
-
+mat <- matrix(1, nrow=5, ncol=5)
+for (row in 1:3){
+  for (col in 3:5){
+    mat[row, col] = 15
+  }
+}
+mat
 ```
 
 ```{r}
+mat <- matrix(1:12, ncol=4)
+means <-  numeric(nrow(mat))
 
+for (i in 1:nrow(mat)){
+  means[i] <- mean(mat[i,])
+}
+means
 ```
 
 ```{r}
+mat <- matrix(1:12, ncol=4)
+sums <-  numeric(nrow(mat))
 
+for (i in 1:nrow(mat)){
+  sums[i] <- sum(mat[i,])
+}
+sums
 ```
 
 Like Python, we have while loops in R:
 
 ```{r}
-
+while (condition){
+  do something
+}
 ```
 
 ## In Class Exercise 7:
@@ -1010,7 +1173,15 @@ Like Python, we have while loops in R:
 Write a while loop that calculates the sum of the numbers 1-10:
 
 ```{r}
+x <-  1:10
+y <- 0
+for(val in x){
+  while (y <= 55){
+    y <- y+val
+  }
+}
 
+y
 ```
 
 ## Tibbles
@@ -1022,11 +1193,20 @@ make working with data easier and more intuitive. It is part of our
 `tidyverse` package!!!!
 
 ```{r}
-
+install.packages('tidyverse')
+library(tidyverse)
 ```
 
 ```{r}
+# Create a tibble:
+num <- c(1,2,3)
+char <- c('John', 'Jane', 'Jimmy')
+fact <- factor(c('male', 'female', 'male'))
+logi <- c(TRUE, FALSE, TRUE)
 
+# Bring them all together:
+my_tbl <- tibble(num, char, fact, logi)
+my_tbl
 ```
 
 #### Data Frames VS Tibbles
@@ -1072,27 +1252,31 @@ What if we wanted to convert a Data Frame object into a Tibbles object?
 We have a method for that!
 
 ```{r}
+df <- data.frame(x=1:26, y= letters[1:26], z= c(TRUE, FALSE, TRUE, FALSE, TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE))
 
+tb <- as_tibble(df)
+tb
 ```
 
 If we need to make a tibble display more columns than it thinks it
 should, we can override it with `print()`:
 
 ```{r}
-
+print(tb)
 ```
 
 The best way to see more of the data than a tibble default displays is
 to use View(). Nice!
 
 ```{r}
-
+View(tb)
 ```
 
 #### Subsetting
 
 ```{r}
-
+tb$x
+tb['x']
 ```
 
 At this point, it should be pointed out that the transformation
@@ -1107,35 +1291,37 @@ interacting with older code.
 ## Reading Data
 
 ```{r}
-
+read_csv("C:/Users/Alex Lucchesi/OneDrive/Documents/teaching_test/femaleMiceWeights.csv")
 ```
 
 ## Tibble Functions
 
 Tibble and dplyr work wonders together! We can manipulate Tibbles using
 dplyr functions, which provide us a streamlined way to filter, select,
-group, summarize, and mutate data! \### `filter()`
+group, summarize, and mutate data!
+
+### `filter()`
 
 ```{r}
-
+filter(my_tbl, num > 1)
 ```
 
 ### `select()`
 
 ```{r}
-
+select(my_tbl, num, char)
 ```
 
 ### `group_by()`, `summarize()`
 
 ```{r}
-
+group_by(my_tbl, fact) %>% summarize(avg_num = mean(num))
 ```
 
 ### `mutate()`
 
 ```{r}
-
+mutate(my_tbl, num_squared = num ^ 2)
 ```
 
 ## N/A Values
@@ -1155,7 +1341,8 @@ tibbles is na_if(), which can be used to replace specified values with
 NA.
 
 ```{r}
-
+tb <- tibble(x = c(1,2,'missing', 4, 5, 'missing'))
+tb <- tb %>% mutate(x = na_if(x, 'missing'))
 ```
 
 Now that we replaced all our "missing" values with a NA, let's explore
@@ -1165,7 +1352,8 @@ Tibbles uses the function `replace_na()`, which we can use to replace
 all the `NA` values with a specified value.
 
 ```{r}
-
+tb %>%
+  replace_na(list(x ='0'))
 ```
 
 ## Importing/Exporting Data
@@ -1174,7 +1362,10 @@ Tibbles can be imported and exported using a variety of file formats!
 Some examples of this are CSV, Excel, and even SQL databases!
 
 ```{r}
+my_data <- read_csv("C:/Users/Alex Lucchesi/OneDrive/Documents/teaching_test/femaleMiceWeights.csv") %>% as_tibble()
 
+# Export the data as a csv file:
+write_csv(my_data, 'my_data.csv')
 ```
 
 ### Homework
@@ -1182,10 +1373,38 @@ Some examples of this are CSV, Excel, and even SQL databases!
 1.  Do 5 CodeWars problems in R. Share your solutions here:
 
     ```{r}
-    # Problem 1 I solved in R:
-    # Write the solution
+    #Problem 1:
+    even_or_odd <- function(n) {
+      if (n %% 2 == 0) {
+    return("Even")
+      }else{
+      return("Odd")
+    }
+    }
 
-    # Pr
+    #Problem 2:
+    mul <- function(a, b) {
+      return(a * b) # try to figure out why it doesn't work!
+    }
+
+
+    #Problem 3:
+    double_integer <- function(i) {
+      # Double the integer and return it!
+      return(i**2)
+    }
+
+
+    #Problem 4:
+    make_negative <- function(num){
+      return(-abs(num))
+    }
+
+    #Problem 5:
+    litres <- function(time) {
+      drink <- time * 0.5
+      return(as.integer(drink))
+    }
     ```
 
 2.  Create a function that checks an input of type `int` and returns
@@ -1193,7 +1412,18 @@ Some examples of this are CSV, Excel, and even SQL databases!
     multiple of 5, and fizzbuzz if the number is a multiple of 3 and 5.
 
     ```{r}
-
+    fizz_buzz <- function(number) {
+      if (number %% 3 == 0 && number %% 5 == 0) {
+    return("FizzBuzz")
+      } else if (number %% 3 == 0) {
+    return("Fizz")
+      } else if (number %% 5 == 0) {
+    return("Buzz")
+      } else {
+    return(number)
+      }
+    }
+    fizz_buzz(15)
     ```
 
 3.  **Mario Challenge:** In the classic Super Mario games, Mario ends
@@ -1216,6 +1446,12 @@ Some examples of this are CSV, Excel, and even SQL databases!
 
     ```{r}
     # You may feel more comfortable figuring this out in Python first, then translating into R later.
+    marioStairs <- function(num) {
+      for(i in 1:(num)) {
+    print(strrep('X', i))
+      }
+    }
+    marioStairs(5)
     ```
 
 4.  Find a built-in dataset you would like to explore. Explore the
@@ -1231,17 +1467,27 @@ Some examples of this are CSV, Excel, and even SQL databases!
 -   Column 2: Data Type
 
 ```{r}
-
+quakes
 ```
 
 ```{r}
-
+data(quakes)
 ```
 
 ```{r}
-
+?quakes
 ```
 
 ```{r}
+summary(quakes)
+```
 
+```{r}
+ data_summary <- quakes %>%
+  summarise(
+    mean_depth = mean(depth),
+    sd_depth = sd(depth),
+    mean_mag = mean(mag),
+    sd_mag = sd(mag)
+  )
 ```
