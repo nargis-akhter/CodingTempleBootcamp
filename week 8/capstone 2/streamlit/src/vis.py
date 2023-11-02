@@ -28,7 +28,7 @@ if page == 'About':
                 
                 Note: Some images my not populate''')
     st.subheader('Visualizations')
-    st.write('Display visualizations of scatterplots, histograms, and bar charts')
+    st.write('Display visualizations of bar charts, scatterplots, and histograms.')
     st.subheader('Summary')
     st.write('dhwjd')
  
@@ -51,8 +51,14 @@ if page == 'Visualizations':
     numeric_columns = list(df.select_dtypes(include = 'number'))
     numeric_columns.remove('id')
     st.title(':chart_with_upwards_trend: Visualizations')
-    vis_to_use = ['scatterplot', 'histogram', 'bar chart']
+    vis_to_use = ['scatterplot', 'histogram', 'bar chart', 'line chart']
     vis = st.selectbox("Select the type of visualization you want to see", options = vis_to_use)
+    if vis == 'bar chart':
+        x = st.selectbox('Select the column for the X-axis', options = list(df.select_dtypes(include = 'object')))
+        try:
+            st.plotly_chart(px.histogram(df, x=x).update_xaxes(categoryorder = "total descending"))
+        except:
+            st.error('Error')
     if vis == 'scatterplot': 
         x = st.selectbox('Select the column for the X-axis', options=numeric_columns)
         y = st.selectbox('Select the column for the Y-axis', options=numeric_columns)
@@ -68,12 +74,15 @@ if page == 'Visualizations':
                 st.plotly_chart(px.histogram(df, x))
             except:
                 st.error('Error')
-    if vis == 'bar chart':
-        x = st.selectbox('Select the column for the X-axis', options = list(df.select_dtypes(include = 'object')))
-        try:
-            st.plotly_chart(px.histogram(df, x=x).update_xaxes(categoryorder = "total descending"))
-        except:
-            st.error('Error')
+    if vis == 'line chart':
+        x = st.selectbox('Select the column for the X-axis', options=numeric_columns)  
+        y = st.selectbox('Select the column for the Y-axis', options=df.select_dtypes(include='number').columns)
+        if x and y:
+            try:
+                st.plotly_chart(px.line(df, x=x, y=y))
+            except:
+                st.error('Error')
+    
             
             
 if page == 'Summary':
