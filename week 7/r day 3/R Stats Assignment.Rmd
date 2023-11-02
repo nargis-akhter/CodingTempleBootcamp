@@ -24,7 +24,7 @@ To receive credit for today's assignment, you will need to:
 
 ```{r}
 #Load necessary packages
-library(tidyverse, dplyr)
+library(tidyverse, dplyr, ggplot2)
 ```
 
 ```{r}
@@ -84,6 +84,11 @@ view(my_new_tibble)
 ```
 
 ```{r}
+sum(is.na(my_new_tibble))
+
+```
+
+```{r}
 # Mutate a new column
 cod <- my_new_tibble %>%
   mutate(my_new_tibble, avg_score = (critic_compound_score + user_compound_score)/2)
@@ -131,8 +136,7 @@ ggplot(new_tibble) +
 
 ```{r}
 ggplot(new_tibble) +
-  geom_boxplot(aes(x = release_year, y = user_compound_score), fill = "blue") +
-  labs(title = "Box Plot of User Scores Over Time", x = "Release Year", y = "User Score")
+  geom_boxplot(aes(x = release_year, y = user_compound_score), fill = "blue") + labs(title = "Box Plot of User Scores Over Time", x = "Release Year", y = "User Score")
 ```
 
 ```{r}

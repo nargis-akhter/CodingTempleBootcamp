@@ -1,0 +1,879 @@
+---
+title: "R: Time Usage By Activities"
+author: "Nargis Akhter"
+date: "2023/10/30"
+output: html_document
+---
+
+# Capstone 1
+
+This time-tracking dataset (country, sex) was extracted from <https://perso.telecom-paristech.fr/eagan/class/igr204/datasets> for exploring, cleaning, transformation, visualization (vis.), statistical testing, and analysis.
+
+## Load & Clean Data
+
+1.  Load Packages & Data
+
+2.  Rename Column Headers
+
+    -Change periods into underscores
+
+    -Change double underscores to single underscores
+
+3.  Null Values
+
+4.  Mutate Columns
+
+```{r}
+#load packages
+library(tidyverse, dplyr)
+```
+
+```{r}
+#load data
+time_use <- read.csv("data/time use.csv")
+time_use
+```
+
+```{r}
+#convert to a tibble
+time_usage <- as_tibble(time_use)
+view(time_usage)
+```
+
+```{r}
+#check column data types
+str(time_usage)
+```
+
+```{r}
+class(time_usage)
+```
+
+```{r}
+#rename column names 
+
+#ridding the . and __
+rename_cols <- function(x){
+  names(x) <- names(x) %>% str_replace_all("\\.","_") %>% tolower()
+  names(x) <- names(x) %>% str_replace_all("__","_") %>% tolower()
+  return(x)
+}
+
+time_usage <- rename_cols(time_usage)
+view(time_usage)
+```
+
+```{r}
+#convert total column to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  total <- hours * 60 + minutes
+  return(total)
+}
+
+#mutate total column
+time_usage <- time_usage %>%
+  mutate(total = sapply(time_usage$total, convert_time_to_minutes))
+```
+
+```{r}
+#convert personal_column to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  personal_care <- hours * 60 + minutes
+  return(personal_care)
+}
+
+#mutate personal_care column
+time_usage <- time_usage %>%
+  mutate(personal_care = sapply(time_usage$personal_care, convert_time_to_minutes))
+```
+
+```{r}
+#convert sleep to total minutes
+
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  sleep <- hours * 60 + minutes
+  return(sleep)
+}
+
+#mutate sleep column
+time_usage <- time_usage %>%
+  mutate(sleep = sapply(time_usage$sleep, convert_time_to_minutes))
+```
+
+```{r}
+#convert eating to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  eating <- hours * 60 + minutes
+  return(eating)
+}
+
+#mutate eating column
+time_usage <- time_usage %>%
+  mutate(eating = sapply(time_usage$eating, convert_time_to_minutes))
+```
+
+```{r}
+#convert other_and_or_unspecified_personal_cares to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  other_and_or_unspecified_personal_care <- hours * 60 + minutes
+  return(other_and_or_unspecified_personal_care)
+}
+
+#mutate other_and_or_unspecified_personal_cares column
+time_usage <- time_usage %>%
+  mutate(other_and_or_unspecified_personal_care = sapply(time_usage$other_and_or_unspecified_personal_care, convert_time_to_minutes))
+```
+
+```{r}
+#convert employment_related_activities_and_travel_as_part_of_during_main_and_second_job to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  employment_related_activities_and_travel_as_part_of_during_main_and_second_job <- hours * 60 + minutes
+  return(employment_related_activities_and_travel_as_part_of_during_main_and_second_job)
+}
+
+#mutate employment_related_activities_and_travel_as_part_of_during_main_and_second_job column
+time_usage <- time_usage %>%
+  mutate(employment_related_activities_and_travel_as_part_of_during_main_and_second_job = sapply(time_usage$employment_related_activities_and_travel_as_part_of_during_main_and_second_job, convert_time_to_minutes))
+```
+
+```{r}
+#convert main_and_second_job_and_related_travel to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  main_and_second_job_and_related_travel <- hours * 60 + minutes
+  return(main_and_second_job_and_related_travel)
+}
+
+#mutate main_and_second_job_and_related_travel column
+time_usage <- time_usage %>%
+  mutate(main_and_second_job_and_related_travel = sapply(time_usage$main_and_second_job_and_related_travel, convert_time_to_minutes))
+```
+
+```{r}
+#convert activities_related_to_employment_and_unspecified_employment to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  activities_related_to_employment_and_unspecified_employment <- hours * 60 + minutes
+  return(activities_related_to_employment_and_unspecified_employment)
+}
+
+#mutate activities_related_to_employment_and_unspecified_employment column
+time_usage <- time_usage %>%
+  mutate(activities_related_to_employment_and_unspecified_employment = sapply(time_usage$activities_related_to_employment_and_unspecified_employment, convert_time_to_minutes))
+```
+
+```{r}
+#convert study to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  study <- hours * 60 + minutes
+  return(study)
+}
+
+#mutate study column
+time_usage <- time_usage %>%
+  mutate(study = sapply(time_usage$study, convert_time_to_minutes))
+```
+
+```{r}
+#convert school_and_university_except_homework to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  school_and_university_except_homework <- hours * 60 + minutes
+  return(school_and_university_except_homework)
+}
+
+#mutate school_and_university_except_homework column
+time_usage <- time_usage %>%
+  mutate(school_and_university_except_homework = sapply(time_usage$school_and_university_except_homework, convert_time_to_minutes))
+```
+
+```{r}
+#convert homework to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  homework <- hours * 60 + minutes
+  return(homework)
+}
+
+#mutate homework column
+time_usage <- time_usage %>%
+  mutate(homework = sapply(time_usage$homework, convert_time_to_minutes))
+```
+
+```{r}
+#convert free_time_study to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  free_time_study <- hours * 60 + minutes
+  return(free_time_study)
+}
+
+#mutate free_time_study column
+time_usage <- time_usage %>%
+  mutate(free_time_study = sapply(time_usage$free_time_study, convert_time_to_minutes))
+```
+
+```{r}
+#convert household_and_family_care to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  household_and_family_care <- hours * 60 + minutes
+  return(household_and_family_care)
+}
+
+#mutate household_and_family_care column
+time_usage <- time_usage %>%
+  mutate(household_and_family_care = sapply(time_usage$household_and_family_care, convert_time_to_minutes))
+```
+
+```{r}
+#convert food_management_except_dish_washing to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  food_management_except_dish_washing <- hours * 60 + minutes
+  return(food_management_except_dish_washing)
+}
+
+#mutate food_management_except_dish_washing column
+time_usage <- time_usage %>%
+  mutate(food_management_except_dish_washing = sapply(time_usage$food_management_except_dish_washing, convert_time_to_minutes))
+```
+
+```{r}
+#convert dish_washing to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  dish_washing <- hours * 60 + minutes
+  return(dish_washing)
+}
+
+#mutate dish_washing column
+time_usage <- time_usage %>%
+  mutate(dish_washing = sapply(time_usage$dish_washing, convert_time_to_minutes))
+```
+
+```{r}
+#convert cleaning_dwelling to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  cleaning_dwelling <- hours * 60 + minutes
+  return(cleaning_dwelling)
+}
+
+#mutate cleaning_dwelling column
+time_usage <- time_usage %>%
+  mutate(cleaning_dwelling = sapply(time_usage$cleaning_dwelling, convert_time_to_minutes))
+```
+
+```{r}
+#convert household_upkeep_except_cleaning_dwelling to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  household_upkeep_except_cleaning_dwelling <- hours * 60 + minutes
+  return(household_upkeep_except_cleaning_dwelling)
+}
+
+#mutate cleanhousehold_upkeep_except_cleaning_dwellinging_dwelling column
+time_usage <- time_usage %>%
+  mutate(household_upkeep_except_cleaning_dwelling = sapply(time_usage$household_upkeep_except_cleaning_dwelling, convert_time_to_minutes))
+```
+
+```{r}
+#convert laundry to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  laundry <- hours * 60 + minutes
+  return(laundry)
+}
+
+#mutate laundry column
+time_usage <- time_usage %>%
+  mutate(laundry = sapply(time_usage$laundry, convert_time_to_minutes))
+```
+
+```{r}
+#convert ironing to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  ironing <- hours * 60 + minutes
+  return(ironing)
+}
+
+#mutate ironing column
+time_usage <- time_usage %>%
+  mutate(ironing = sapply(time_usage$ironing, convert_time_to_minutes))
+```
+
+```{r}
+#convert handicraft_and_producing_textiles_and_other_care_for_textiles to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  handicraft_and_producing_textiles_and_other_care_for_textiles <- hours * 60 + minutes
+  return(handicraft_and_producing_textiles_and_other_care_for_textiles)
+}
+
+#mutate handicraft_and_producing_textiles_and_other_care_for_textiles column
+time_usage <- time_usage %>%
+  mutate(handicraft_and_producing_textiles_and_other_care_for_textiles = sapply(time_usage$handicraft_and_producing_textiles_and_other_care_for_textiles, convert_time_to_minutes))
+```
+
+```{r}
+#convert gardening_other_pet_care to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  gardening_other_pet_care <- hours * 60 + minutes
+  return(gardening_other_pet_care)
+}
+
+#mutate gardening_other_pet_care column
+time_usage <- time_usage %>%
+  mutate(gardening_other_pet_care = sapply(time_usage$gardening_other_pet_care, convert_time_to_minutes))
+```
+
+```{r}
+#convert tending_domestic_animals to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  tending_domestic_animals <- hours * 60 + minutes
+  return(tending_domestic_animals)
+}
+
+#mutate tending_domestic_animals column
+time_usage <- time_usage %>%
+  mutate(tending_domestic_animals = sapply(time_usage$tending_domestic_animals, convert_time_to_minutes))
+```
+
+```{r}
+#convert caring_for_pets to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  caring_for_pets <- hours * 60 + minutes
+  return(caring_for_pets)
+}
+
+#mutate caring_for_pets column
+time_usage <- time_usage %>%
+  mutate(caring_for_pets = sapply(time_usage$caring_for_pets, convert_time_to_minutes))
+```
+
+```{r}
+#convert walking_the_dog to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  walking_the_dog <- hours * 60 + minutes
+  return(walking_the_dog)
+}
+
+#mutate walking_the_dog column
+time_usage <- time_usage %>%
+  mutate(walking_the_dog = sapply(time_usage$walking_the_dog, convert_time_to_minutes))
+```
+
+```{r}
+#convert construction_and_repairs to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  construction_and_repairs <- hours * 60 + minutes
+  return(construction_and_repairs)
+}
+
+#mutate construction_and_repairs column
+time_usage <- time_usage %>%
+  mutate(construction_and_repairs = sapply(time_usage$construction_and_repairs, convert_time_to_minutes))
+```
+
+```{r}
+#convert shopping_and_services to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  shopping_and_services <- hours * 60 + minutes
+  return(shopping_and_services)
+}
+
+#mutate shopping_and_services column
+time_usage <- time_usage %>%
+  mutate(shopping_and_services = sapply(time_usage$shopping_and_services, convert_time_to_minutes))
+```
+
+```{r}
+#convert childcare_except_teaching_reading_and_talking to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  childcare_except_teaching_reading_and_talking <- hours * 60 + minutes
+  return(childcare_except_teaching_reading_and_talking)
+}
+
+#mutate childcare_except_teaching_reading_and_talking column
+time_usage <- time_usage %>%
+  mutate(childcare_except_teaching_reading_and_talking = sapply(time_usage$childcare_except_teaching_reading_and_talking, convert_time_to_minutes))
+```
+
+```{r}
+#convert teaching_reading_and_talking_with_child to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  teaching_reading_and_talking_with_child <- hours * 60 + minutes
+  return(teaching_reading_and_talking_with_child)
+}
+
+#mutate teaching_reading_and_talking_with_child column
+time_usage <- time_usage %>%
+  mutate(teaching_reading_and_talking_with_child = sapply(time_usage$teaching_reading_and_talking_with_child, convert_time_to_minutes))
+```
+
+```{r}
+#convert household_management_and_help_family_member to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  household_management_and_help_family_member <- hours * 60 + minutes
+  return(household_management_and_help_family_member)
+}
+
+#mutate household_management_and_help_family_member column
+time_usage <- time_usage %>%
+  mutate(household_management_and_help_family_member = sapply(time_usage$household_management_and_help_family_member, convert_time_to_minutes))
+```
+
+```{r}
+#convert leisure_social_and_associative_life to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  leisure_social_and_associative_life <- hours * 60 + minutes
+  return(leisure_social_and_associative_life)
+}
+
+#mutate leisure_social_and_associative_life column
+time_usage <- time_usage %>%
+  mutate(leisure_social_and_associative_life = sapply(time_usage$leisure_social_and_associative_life, convert_time_to_minutes))
+```
+
+```{r}
+#convert organisational_work to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  organisational_work <- hours * 60 + minutes
+  return(organisational_work)
+}
+
+#mutate organisational_work column
+time_usage <- time_usage %>%
+  mutate(organisational_work = sapply(time_usage$organisational_work, convert_time_to_minutes))
+```
+
+```{r}
+#convert informal_help_to_other_households to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  informal_help_to_other_households <- hours * 60 + minutes
+  return(informal_help_to_other_households)
+}
+
+#mutate informal_help_to_other_households column
+time_usage <- time_usage %>%
+  mutate(informal_help_to_other_households = sapply(time_usage$informal_help_to_other_households, convert_time_to_minutes))
+```
+
+```{r}
+#convert participatory_activities to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  participatory_activities <- hours * 60 + minutes
+  return(participatory_activities)
+}
+
+#mutate participatory_activities column
+time_usage <- time_usage %>%
+  mutate(participatory_activities = sapply(time_usage$participatory_activities, convert_time_to_minutes))
+```
+
+```{r}
+#convert visiting_and_feasts to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  visiting_and_feasts <- hours * 60 + minutes
+  return(visiting_and_feasts)
+}
+
+#mutate visiting_and_feasts column
+time_usage <- time_usage %>%
+  mutate(visiting_and_feasts = sapply(time_usage$visiting_and_feasts, convert_time_to_minutes))
+```
+
+```{r}
+#convert other_social_life to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  other_social_life <- hours * 60 + minutes
+  return(other_social_life)
+}
+
+#mutate other_social_life column
+time_usage <- time_usage %>%
+  mutate(other_social_life = sapply(time_usage$other_social_life, convert_time_to_minutes))
+```
+
+```{r}
+#convert entertainment_and_culture to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  entertainment_and_culture <- hours * 60 + minutes
+  return(entertainment_and_culture)
+}
+
+#mutate entertainment_and_culture column
+time_usage <- time_usage %>%
+  mutate(entertainment_and_culture = sapply(time_usage$entertainment_and_culture, convert_time_to_minutes))
+```
+
+```{r}
+#convert resting to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  resting <- hours * 60 + minutes
+  return(resting)
+}
+
+#mutate resting column
+time_usage <- time_usage %>%
+  mutate(resting = sapply(time_usage$resting, convert_time_to_minutes))
+```
+
+```{r}
+#convert walking_and_hiking to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  walking_and_hiking <- hours * 60 + minutes
+  return(walking_and_hiking)
+}
+
+#mutate walking_and_hiking column
+time_usage <- time_usage %>%
+  mutate(walking_and_hiking = sapply(time_usage$walking_and_hiking, convert_time_to_minutes))
+```
+
+```{r}
+#convert sports_and_outdoor_activities_except_walking_and_hiking to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  sports_and_outdoor_activities_except_walking_and_hiking <- hours * 60 + minutes
+  return(sports_and_outdoor_activities_except_walking_and_hiking)
+}
+
+#mutate sports_and_outdoor_activities_except_walking_and_hiking column
+time_usage <- time_usage %>%
+  mutate(sports_and_outdoor_activities_except_walking_and_hiking = sapply(time_usage$sports_and_outdoor_activities_except_walking_and_hiking, convert_time_to_minutes))
+```
+
+```{r}
+#convert computer_games to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  computer_games <- hours * 60 + minutes
+  return(computer_games)
+}
+
+#mutate computer_games column
+time_usage <- time_usage %>%
+  mutate(computer_games = sapply(time_usage$computer_games, convert_time_to_minutes))
+```
+
+```{r}
+#convert reading_books to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  reading_books <- hours * 60 + minutes
+  return(reading_books)
+}
+
+#mutate reading_books column
+time_usage <- time_usage %>%
+  mutate(reading_books = sapply(time_usage$reading_books, convert_time_to_minutes))
+```
+
+```{r}
+#convert reading_except_books to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  reading_except_books <- hours * 60 + minutes
+  return(reading_except_books)
+}
+
+#mutate reading_except_books column
+time_usage <- time_usage %>%
+  mutate(reading_except_books = sapply(time_usage$reading_except_books, convert_time_to_minutes))
+```
+
+```{r}
+#convert tv_and_video to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  tv_and_video <- hours * 60 + minutes
+  return(tv_and_video)
+}
+
+#mutate tv_and_video column
+time_usage <- time_usage %>%
+  mutate(tv_and_video = sapply(time_usage$tv_and_video, convert_time_to_minutes))
+```
+
+```{r}
+#convert radio_and_music to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  radio_and_music <- hours * 60 + minutes
+  return(radio_and_music)
+}
+
+#mutate radio_and_music column
+time_usage <- time_usage %>%
+  mutate(radio_and_music = sapply(time_usage$radio_and_music, convert_time_to_minutes))
+```
+
+```{r}
+#convert unspecified_leisure to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  unspecified_leisure <- hours * 60 + minutes
+  return(unspecified_leisure)
+}
+
+#mutate unspecified_leisure column
+time_usage <- time_usage %>%
+  mutate(unspecified_leisure = sapply(time_usage$unspecified_leisure, convert_time_to_minutes))
+```
+
+```{r}
+#convert travel_except_travel_related_to_jobs to total minutes
+convert_time_to_minutes <- function(time_str) {
+  time_parts <- unlist(strsplit(time_str, ":"))
+  hours <- as.integer(time_parts[1])
+  minutes <- as.integer(time_parts[2])
+  travel_except_travel_related_to_jobs <- hours * 60 + minutes
+  return(travel_except_travel_related_to_jobs)
+}
+
+#mutate travel_except_travel_related_to_jobs column
+time_usage <- time_usage %>%
+  mutate(travel_except_travel_related_to_jobs = sapply(time_usage$travel_except_travel_related_to_jobs, convert_time_to_minutes))
+```
+
+```{r}
+view(time_usage)
+```
+
+```{r}
+#check for missing values
+sum(is.na(time_usage))
+```
+
+```{r}
+time_usage <- time_usage %>%
+  drop_na()
+```
+
+```{r}
+sum(is.na(time_usage))
+```
+
+```{r}
+#feature engineering new column
+
+#average personal care time
+time <- time_usage %>% 
+    mutate(time_usage, avg_personal_care = (personal_care + other_and_or_unspecified_personal_care) / 2)
+
+view(time)
+```
+
+## Hypotheses
+
+Null Hypothesis (H0): The average time spent on personal care by females is equal to or less than the average time spent by males
+
+Alternative Hypothesis (H1): The average time spent on personal care by females is greater than the average time spent by males
+
+## Explore
+
+1.  View the distribution of the target column (personal_care)
+2.  View the average and median time spent on personal care by gender
+3.  View scatter plot of personal care time by gender
+
+```{r}
+#histogram of personal care
+ggplot(time, aes(x = personal_care)) +
+  geom_histogram(binwidth = 20, fill = "purple", color = "black") +
+  labs(title = "Distribution of Personal Care", x = "Personal Care Time (Minutes)", y = "Frequency")
+```
+
+```{r}
+mean(time$personal_care)
+```
+
+```{r}
+#grouped bar plot to compare personal care time by gender
+ggplot(data = time, aes(x = sex, y = personal_care, fill = sex)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.5) +
+  xlab("Gender") +
+  ylab("Personal Care Time (Minutes)") +
+  ggtitle("Comparison of Personal Care Time by Gender") +
+  scale_fill_manual(values = c("Males" = "blue", "Females" = "pink"))
+```
+
+```{r}
+#average time spent on personal care by females
+women_personal_care <- time[time$sex == "Females", ]
+
+avg_women_personal_care <- mean(women_personal_care$personal_care, na.rm = TRUE)
+avg_women_personal_care
+```
+
+```{r}
+#average time spent on personal care by males
+men_personal_care <- time[time$sex == "Males", ]
+
+avg_men_personal_care <- mean(men_personal_care$personal_care, na.rm = TRUE)
+avg_men_personal_care
+```
+
+```{r}
+#boxplot of personal care
+ggplot(time, aes(x = sex, y = personal_care)) +
+  geom_boxplot(fill = "green", color = "black") +
+  labs(title = "Median Time Spent on Personal Care by Gender", x = "Gender", y = "Personal Care Time (Minutes)")
+```
+
+```{r}
+#median time spent on personal care by females
+women_personal_care <- time[time$sex == "Females", ]
+
+median_women_personal_care <- median(women_personal_care$personal_care, na.rm = TRUE)
+median_women_personal_care
+```
+
+```{r}
+#median time spent on personal care by males
+men_personal_care <- time[time$sex == "Males", ]
+
+median_men_personal_care <- median(men_personal_care$personal_care, na.rm = TRUE)
+median_men_personal_care
+```
+
+```{r}
+#scatter plot of personal care
+ggplot(data = time, aes(x = sex, y = personal_care, color = sex)) +
+  geom_point() +
+  xlab("Gender") +
+  ylab("Personal Care Time (Minutes)") +
+  ggtitle("Scatter Plot of Personal Care Time by Gender")
+```
+
+## Statistical Testing
+
+```{r}
+filtered_data <- time %>%
+  filter(sex %in% c("Females", "Males"))
+
+#perform an independent two-sample t-test
+t_test_result <- t.test(personal_care ~ sex, data = filtered_data)
+print(t_test_result)
+```
+
+## Analyze
+
+In summary, a p-value of 0.4698 indicates that there is no statistically significant difference in the amount of time spent on personal care between females and females. The alternative hypothesis suggests that the true difference between the two groups is not equal to 0. The confidence interval falls between roughly -14.06314 and 29.63457. This suggests that the mean difference is not statistically significant since this interval contains 0. Therefore, we fail to reject the null hypothesis.

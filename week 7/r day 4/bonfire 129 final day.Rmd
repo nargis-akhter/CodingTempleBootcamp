@@ -19,7 +19,7 @@ library(tidyverse)
 ```
 
 ```{r}
-df <- read_csv("C:/Users/Alex Lucchesi/Downloads/HR_Analytics.csv")
+df <- read_csv("C:/Users/nargi/Documents/coding temple/week 7/r day 4/data/hr analytics.csv")
 df
 ```
 
@@ -44,7 +44,7 @@ $Ha:$ Salary and Education have a statistical significance to one another
 ### Step 2: Tidy our Data:
 
 ```{r}
-# Replace column names
+# Replace column names
 colnames(df) <- gsub("([a-z0-9])([A-Z])", "\\1_\\2", colnames(df))
 ```
 
@@ -57,6 +57,11 @@ names(df)
 
     ```{r}
     colSums(is.na(df))
+    ```
+
+    ```{r}
+    sum(is.na(df))
+
     ```
 
 **If I had a column with null values that pertained to my analysis, I need to explore the data and then come up with a solution. If I tried to drop before checking how that would affect my data, we may end up missing data that had to do with a relationship or was important to the overall understanding of the target variable.**
@@ -111,7 +116,7 @@ cor(df$performance_rating, df$monthly_income) * 100
 ```
 
 ```{r}
-?filter
+#?filter
 df1 <- filter(df, education != 5)
 ```
 
