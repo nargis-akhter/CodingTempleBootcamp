@@ -61,7 +61,7 @@ if page == 'Visualizations':
             except:
                 st.error('Error')
     if vis == 'box plot':
-        x = st.selectbox('Select the column for the X-axis', options = numeric_columns)
+        x = st.selectbox('Select the column to view distribution', options = numeric_columns)
         if x:
             try:
                 st.plotly_chart(px.box(df, x))
@@ -92,7 +92,7 @@ if page == 'Summary':
             I had cleaned into a CSV file. Then I created another Python file and imported all of the important imports 
             in order to get my Streamlit application up and running. This application allows users to look up a selected 
             brand and products in order to view the product images. The option to view the raw data is also available.
-            This application also allows users to select different types of visualizattions to display such as histograms, 
+            This application also allows users to select different types of visualizations to display such as histograms, 
             box plots, scatterplots, and bar charts.
              ''')
     st.image('streamlit-logo.png')
