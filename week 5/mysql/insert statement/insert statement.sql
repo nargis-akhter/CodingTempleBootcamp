@@ -6,7 +6,8 @@ INSERT INTO employees
     last_name,
     gender,
     hire_date
-) VALUES
+) 
+VALUES
 (
 	999901,
     '1986-04-21',
