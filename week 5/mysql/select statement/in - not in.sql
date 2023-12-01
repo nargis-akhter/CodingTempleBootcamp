@@ -3,7 +3,7 @@ SELECT
 FROM
     employees
 WHERE
-    first_name IN ('Denis' , 'Elvis');
+    first_name IN ('Denis' , 'Elvis'); #like multiple equal statements
     
 SELECT 
     *
