@@ -1,8 +1,8 @@
-#on delete cascade - if a specific value from the parent table's primary key has been deleted, all the records from the child table will be removed as well
+/*
+-on delete cascade - if a specific value from the parent table's primary key has been deleted, all the records from the child table will be removed as well
+-where clause is very important or else you will lose all of your information!
+*/
 
-#where clause is very important - or else you will lose all of your information!
-
-USE employees;
 COMMIT;
 
 SELECT 

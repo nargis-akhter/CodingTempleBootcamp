@@ -1,6 +1,8 @@
-#Write a query that obtains two columns. The first column must contain annual salaries higher than 80,000 dollars. 
-#The second column, renamed to "emps_with_same_salary", must show the number of employees contracted to that salary. 
-#Lastly, sort the output by the first column.
+/*
+-write a query that obtains two columns. The first column must contain annual salaries higher than 80,000 dollars
+-the second column, renamed to "emps_with_same_salary", must show the number of employees contracted to that salary
+-lastly, sort the output by the first column
+*/
 
 SELECT 
     salary, COUNT(emp_no) AS emps_with_same_salary

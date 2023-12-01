@@ -1,7 +1,11 @@
-/* COALESCE(expression_1, expression_2..., expression_N)
--coalesce() can have one, two, or more arguments
+/* 
+coalesce() syntax:
+COALESCE(expression_1, expression_2..., expression_N)
+
+-think of coalesce() as ifnull() that can have one, two, or more parameters
 */
 
+#three arguments
 SELECT 
     dept_no,
     dept_name,

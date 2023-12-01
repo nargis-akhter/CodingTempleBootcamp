@@ -1,3 +1,5 @@
+USE employees2;
+
 CREATE TABLE EmployeeDemographics (
     EmployeeID INT,
     FirstName VARCHAR(50),
